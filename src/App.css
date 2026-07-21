@@ -58,6 +58,33 @@
   font-synthesis: none;
 }
 
+.dark {
+  --background: #1d2421;
+  --foreground: #e5ebe4;
+  --primary: #c8d6c6;
+  --primary-foreground: #25302b;
+  --card: #27302c;
+  --card-foreground: #e5ebe4;
+  --popover: #2b3530;
+  --popover-foreground: #e5ebe4;
+  --secondary: #364039;
+  --secondary-foreground: #e5ebe4;
+  --muted: #303934;
+  --muted-foreground: #aab5ad;
+  --border: #46524a;
+  --input: #46524a;
+  --ring: #ed9672;
+  --destructive: #f08a70;
+  --sidebar: #202924;
+  --sidebar-foreground: #cad5cb;
+  --sidebar-primary: #c8d6c6;
+  --sidebar-primary-foreground: #25302b;
+  --sidebar-accent: rgba(255, 255, 255, .08);
+  --sidebar-accent-foreground: #eef3ec;
+  --sidebar-border: #3e4b43;
+  --sidebar-ring: #ed9672;
+}
+
 * { box-sizing: border-box; }
 body { margin: 0; min-width: 320px; min-height: 100vh; }
 button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
@@ -143,7 +170,9 @@ button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
 .sidebar-empty [data-slot="empty-media"] { background: rgba(255, 255, 255, .55); }
 .sidebar-empty [data-slot="empty-title"] { font-size: 13px; }
 .sidebar-empty [data-slot="empty-description"] { font-size: 11px; }
-.notes-sidebar-footer { padding: 10px; border-top: 1px solid rgba(125, 143, 132, .16); }
+.notes-sidebar-footer { display: flex; flex-direction: column; gap: 6px; padding: 10px; border-top: 1px solid rgba(125, 143, 132, .16); }
+.theme-toggle { justify-content: flex-start; width: 100%; color: #5c6864; background: rgba(255, 255, 255, .38); }
+.theme-toggle:hover { color: #293735; background: rgba(255, 255, 255, .7); }
 .notes-sidebar-footer [data-sidebar="menu-button"] { height: 42px; }
 .notes-sidebar-footer [data-slot="avatar-fallback"] { color: #fffdf7; background: #a76e51; font-family: Georgia, serif; }
 .profile-copy { display: grid; min-width: 0; gap: 1px; }
@@ -199,6 +228,55 @@ button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
 .tag-input:focus-visible { border-bottom-color: #d5a58c; box-shadow: none; }
 .editor-empty-state { display: grid; min-height: calc(100vh - 88px); place-items: center; padding: 24px; }
 .empty-editor { width: min(100%, 430px); border-color: #d7d9d3; background: rgba(255, 254, 250, .72); }
+
+.dark .notes-workspace { background: #1b211e; }
+.dark .notes-sidebar [data-slot="sidebar-inner"] { background: radial-gradient(circle at 20% 0, rgba(255, 255, 255, .08), transparent 31%), var(--sidebar); }
+.dark .brand, .dark .brand:hover { color: #e5ebe4; }
+.dark .brand-mark { color: #2a302b; background: #ed9672; }
+.dark .new-note-button { color: #25302b; background: #c8d6c6; box-shadow: 0 2px 0 rgba(8, 14, 11, .45); }
+.dark .new-note-button:hover { background: #e0ebdd; }
+.dark .new-note-button kbd { color: #5f6d62; }
+.dark .notes-sidebar [data-sidebar="group-label"], .dark .sidebar-hint, .dark .sidebar-note-copy small, .dark .profile-copy small { color: #92a097; }
+.dark .notes-sidebar [data-sidebar="menu-button"] { color: #bac5bb; }
+.dark .notes-sidebar [data-sidebar="menu-button"][data-active="true"] { color: #f0f5ef; background: rgba(255, 255, 255, .11); box-shadow: inset 2px 0 #ed9672; }
+.dark .notes-sidebar [data-sidebar="menu-button"]:hover { color: #f0f5ef; background: rgba(255, 255, 255, .08); }
+.dark .notes-sidebar [data-sidebar="menu-badge"] { color: #9caaa1; }
+.dark .notes-sidebar [data-sidebar="menu-sub"] { border-left-color: rgba(186, 204, 190, .2); }
+.dark .notes-sidebar [data-sidebar="menu-button"][data-size="lg"][data-active="true"] .sidebar-note-copy small { color: #b4c2b8; }
+.dark .folder-draft [data-sidebar="input"] { border-color: rgba(188, 207, 192, .3); color: #d9e3da; background: rgba(255, 255, 255, .08); }
+.dark .sidebar-empty [data-slot="empty-media"] { background: rgba(255, 255, 255, .09); }
+.dark .notes-sidebar-footer { border-top-color: rgba(190, 207, 194, .16); }
+.dark .theme-toggle { color: #c3cec5; background: rgba(255, 255, 255, .07); }
+.dark .theme-toggle:hover { color: #f0f5ef; background: rgba(255, 255, 255, .13); }
+.dark .notes-sidebar-footer [data-slot="avatar-fallback"] { color: #2c2925; background: #dfae88; }
+.dark .profile-chevron { color: #aab7ac; }
+.dark .editor-inset { background-color: #1b211e; background-image: radial-gradient(rgba(214, 229, 216, .11) .7px, transparent .7px); }
+.dark .editor-toolbar { background: linear-gradient(to bottom, rgba(27, 33, 30, .92), rgba(27, 33, 30, .4)); }
+.dark .eyebrow { color: #9daaa1; }
+.dark .editor-toolbar h1 { color: #e8eee7; }
+.dark .editor-status { color: #a6b3aa; }
+.dark .save-dot { background: #98c29d; box-shadow: 0 0 0 3px rgba(152, 194, 157, .15); }
+.dark .editor-status--saving .save-dot { background: #e0b36a; box-shadow: 0 0 0 3px rgba(224, 179, 106, .15); }
+.dark .editor-status--error, .dark .editor-status--error .save-dot { color: #f08a70; background: #f08a70; }
+.dark .editor-status--error .save-dot { box-shadow: 0 0 0 3px rgba(240, 138, 112, .15); }
+.dark .editor-actions button { color: #abb8ae; }
+.dark .editor-actions button:hover { color: #edf3ed; background: rgba(255, 255, 255, .1); }
+.dark .editor-actions .icon-button--active { color: #f1a480; background: #49352d; }
+.dark .editor-actions .danger-button:hover { color: #f19a83; background: #49312e; }
+.dark .paper { background: #27302c; box-shadow: 0 14px 35px rgba(0, 0, 0, .28), 0 1px 2px rgba(0, 0, 0, .32); }
+.dark .paper-metadata, .dark .paper-footer { color: #a5b0a8; }
+.dark .metadata-separator { color: #58645c; }
+.dark .note-title-input { color: #eef3ed; border-bottom-color: #46524a; }
+.dark .note-title-input:focus-visible { border-bottom-color: #e3a180; }
+.dark .note-body-input { color: #d0d9d1; }
+.dark .note-body-input::placeholder { color: #7f8d83; }
+.dark .paper [data-slot="separator"] { background: #46524a; }
+.dark .editor-tags [data-slot="badge"] { color: #c2cec4; background: #364039; }
+.dark .tag-remove-button { color: #aab7ac; }
+.dark .tag-remove-button:hover { color: #f19a83; background: #49312e; }
+.dark .tag-input { border-bottom-color: #718078; color: #bac6bc; }
+.dark .tag-input:focus-visible { border-bottom-color: #e3a180; }
+.dark .empty-editor { border-color: #46524a; background: rgba(39, 48, 44, .78); }
 
 @media (max-width: 768px) {
   .editor-toolbar { min-height: 72px; padding: 17px 18px 10px; }

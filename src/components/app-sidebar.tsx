@@ -1,4 +1,4 @@
-import { ChevronDown, Plus } from "lucide-react";
+import { ChevronDown, Moon, Plus, Sun } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Kbd } from "@/components/ui/kbd";
@@ -37,6 +37,7 @@ type AppSidebarProps = {
   trashedFolders: Folder[];
   trashCount: number;
   visibleNotes: Note[];
+  theme: "light" | "dark";
   onBeginFolderCreation: () => void;
   onBrandClick: () => void;
   onCancelFolderCreation: () => void;
@@ -51,6 +52,7 @@ type AppSidebarProps = {
   onSelectNote: (noteId: number) => void;
   onSelectTag: (tag: string) => void;
   onTrashFolder: (folder: FolderTreeNode) => void;
+  onToggleTheme: () => void;
 };
 
 export function AppSidebar({
@@ -69,6 +71,7 @@ export function AppSidebar({
   trashedFolders,
   trashCount,
   visibleNotes,
+  theme,
   onBeginFolderCreation,
   onBrandClick,
   onCancelFolderCreation,
@@ -83,6 +86,7 @@ export function AppSidebar({
   onSelectNote,
   onSelectTag,
   onTrashFolder,
+  onToggleTheme,
 }: AppSidebarProps) {
   return (
     <Sidebar collapsible="icon" className="notes-sidebar">
@@ -140,6 +144,16 @@ export function AppSidebar({
       </SidebarContent>
 
       <SidebarFooter className="notes-sidebar-footer">
+        <Button
+          variant="outline"
+          className="theme-toggle"
+          aria-label={theme === "dark" ? "Ativar tema claro" : "Ativar tema escuro"}
+          aria-pressed={theme === "dark"}
+          onClick={onToggleTheme}
+        >
+          {theme === "dark" ? <Sun data-icon="inline-start" /> : <Moon data-icon="inline-start" />}
+          <span>{theme === "dark" ? "Tema claro" : "Tema escuro"}</span>
+        </Button>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" tooltip="Você">

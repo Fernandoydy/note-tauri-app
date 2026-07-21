@@ -13,7 +13,19 @@ import * as notesRepository from "@/lib/notes-repository";
 import type { Folder, FolderTreeNode, Note } from "@/lib/notes-repository";
 import "./App.css";
 
+type Theme = "light" | "dark";
+
+const THEME_STORAGE_KEY = "notes-theme";
+
+function getInitialTheme(): Theme {
+  const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
+  if (storedTheme === "light" || storedTheme === "dark") return storedTheme;
+
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
 function App() {
+  const [theme, setTheme] = useState<Theme>(getInitialTheme);
   const [notes, setNotes] = useState<Note[]>([]);
   const [folderTree, setFolderTree] = useState<FolderTreeNode[]>([]);
   const [trashedFolders, setTrashedFolders] = useState<Folder[]>([]);
@@ -61,6 +73,11 @@ function App() {
       setIsLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", theme === "dark");
+    window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+  }, [theme]);
 
   useEffect(() => {
     void loadWorkspace();
@@ -318,6 +335,8 @@ function App() {
         trashedFolders={trashedFolders}
         trashCount={trashCount}
         visibleNotes={visibleNotes}
+        theme={theme}
+        onToggleTheme={() => setTheme((currentTheme) => (currentTheme === "dark" ? "light" : "dark"))}
         onBeginFolderCreation={() => {
           setFolderDraft("");
           setIsCreatingFolder(true);
