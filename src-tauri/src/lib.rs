@@ -32,6 +32,24 @@ fn migrations() -> Vec<Migration> {
             sql: include_str!("../migrations/0005_index_notes_by_trash_status.sql"),
             kind: MigrationKind::Up,
         },
+        Migration {
+            version: 6,
+            description: "create_folders_table",
+            sql: include_str!("../migrations/0006_create_folders_table.sql"),
+            kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 7,
+            description: "add_folder_id_to_notes",
+            sql: include_str!("../migrations/0007_add_folder_id_to_notes.sql"),
+            kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 8,
+            description: "index_folders_and_note_folder",
+            sql: include_str!("../migrations/0008_index_folders_and_note_folder.sql"),
+            kind: MigrationKind::Up,
+        },
     ]
 }
 
