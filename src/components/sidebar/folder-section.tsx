@@ -1,88 +1,71 @@
-import { Folder as FolderIcon, FolderPlus, RotateCcw } from "lucide-react";
+import { FolderPlus, Search } from "lucide-react";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import {
   SidebarGroup,
   SidebarGroupAction,
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarInput,
-  SidebarMenu,
-  SidebarMenuAction,
-  SidebarMenuButton,
-  SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { FolderTree } from "@/components/sidebar/folder-tree";
 import type { Collection } from "@/components/app-sidebar";
-import type { Folder, FolderTreeNode } from "@/lib/notes-repository";
+import type { FolderTreeNode, Note } from "@/lib/notes-repository";
 
 type SidebarFolderSectionProps = {
   activeCollection: Collection;
-  activeFolderId: number | null;
   folderDraft: string;
   folderTree: FolderTreeNode[];
   isCreatingFolder: boolean;
-  trashedFolders: Folder[];
+  isLoading: boolean;
+  selectedNoteId: number | null;
+  trashedFolderTree: FolderTreeNode[];
+  visibleNotes: Note[];
   onBeginFolderCreation: () => void;
   onCancelFolderCreation: () => void;
   onCreateFolder: () => void;
   onFolderDraftChange: (value: string) => void;
-  onRestoreFolder: (folder: Folder) => void;
-  onSelectFolder: (folder: FolderTreeNode) => void;
+  onRestoreFolder: (folder: FolderTreeNode) => void;
+  onSelectNote: (noteId: number) => void;
   onTrashFolder: (folder: FolderTreeNode) => void;
 };
 
 export function SidebarFolderSection({
   activeCollection,
-  activeFolderId,
   folderDraft,
   folderTree,
   isCreatingFolder,
-  trashedFolders,
+  isLoading,
+  selectedNoteId,
+  trashedFolderTree,
+  visibleNotes,
   onBeginFolderCreation,
   onCancelFolderCreation,
   onCreateFolder,
   onFolderDraftChange,
   onRestoreFolder,
-  onSelectFolder,
+  onSelectNote,
   onTrashFolder,
 }: SidebarFolderSectionProps) {
-  if (activeCollection === "Lixeira") {
-    return trashedFolders.length > 0 ? (
-      <SidebarGroup className="sidebar-folders-group">
-        <SidebarGroupLabel>Pastas na lixeira</SidebarGroupLabel>
-        <SidebarGroupContent>
-          <SidebarMenu>
-            {trashedFolders.map((folder) => (
-              <SidebarMenuItem key={folder.id}>
-                <SidebarMenuButton tooltip={folder.name} onClick={() => onRestoreFolder(folder)}>
-                  <FolderIcon />
-                  <span>{folder.name}</span>
-                </SidebarMenuButton>
-                <SidebarMenuAction
-                  showOnHover
-                  aria-label={`Restaurar ${folder.name}`}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    onRestoreFolder(folder);
-                  }}
-                >
-                  <RotateCcw />
-                </SidebarMenuAction>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarGroupContent>
-      </SidebarGroup>
-    ) : null;
-  }
+  const isTrash = activeCollection === "Lixeira";
+  const currentFolderTree = isTrash ? trashedFolderTree : folderTree;
+  const hasItems = currentFolderTree.length > 0 || visibleNotes.length > 0;
 
   return (
-    <SidebarGroup className="sidebar-folders-group">
-      <SidebarGroupLabel>Pastas</SidebarGroupLabel>
-      <SidebarGroupAction aria-label="Criar pasta" onClick={onBeginFolderCreation}>
-        <FolderPlus />
-      </SidebarGroupAction>
+    <SidebarGroup className="sidebar-notes-group">
+      <SidebarGroupLabel>Notas</SidebarGroupLabel>
+      {isTrash ? null : (
+        <SidebarGroupAction aria-label="Criar pasta" onClick={onBeginFolderCreation}>
+          <FolderPlus />
+        </SidebarGroupAction>
+      )}
       <SidebarGroupContent>
-        {isCreatingFolder ? (
+        {isCreatingFolder && !isTrash ? (
           <form
             className="folder-draft"
             onSubmit={(event) => {
@@ -102,16 +85,29 @@ export function SidebarFolderSection({
             />
           </form>
         ) : null}
-        {folderTree.length > 0 ? (
+        {hasItems ? (
           <FolderTree
-            nodes={folderTree}
-            activeFolderId={activeFolderId}
-            onSelectFolder={onSelectFolder}
+            nodes={currentFolderTree}
+            notes={visibleNotes}
+            selectedNoteId={selectedNoteId}
+            mode={isTrash ? "trash" : "active"}
+            onRestoreFolder={onRestoreFolder}
+            onSelectNote={onSelectNote}
             onTrashFolder={onTrashFolder}
           />
-        ) : (
-          <p className="sidebar-hint">Crie uma pasta para organizar suas notas.</p>
-        )}
+        ) : !isLoading ? (
+          <Empty className="sidebar-empty">
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <Search />
+              </EmptyMedia>
+              <EmptyTitle>Nada por aqui</EmptyTitle>
+              <EmptyDescription>
+                {isTrash ? "A lixeira está vazia." : "Crie uma nota ou ajuste os filtros."}
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+        ) : null}
       </SidebarGroupContent>
     </SidebarGroup>
   );

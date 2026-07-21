@@ -15,15 +15,13 @@ import {
 } from "@/components/ui/sidebar";
 import { SidebarCollectionNav } from "@/components/sidebar/collection-nav";
 import { SidebarFolderSection } from "@/components/sidebar/folder-section";
-import { SidebarNoteList } from "@/components/sidebar/note-list";
 import { SidebarSearch } from "@/components/sidebar/sidebar-search";
-import type { Folder, FolderTreeNode, Note } from "@/lib/notes-repository";
+import type { FolderTreeNode, Note } from "@/lib/notes-repository";
 
 export type Collection = "Todas as notas" | "Favoritas" | "Arquivadas" | "Lixeira";
 
 type AppSidebarProps = {
   activeCollection: Collection;
-  activeFolderId: number | null;
   activeNotesCount: number;
   activeTag: string | null;
   folderDraft: string;
@@ -34,7 +32,7 @@ type AppSidebarProps = {
   search: string;
   searchRef: React.RefObject<HTMLInputElement | null>;
   tags: string[];
-  trashedFolders: Folder[];
+  trashedFolderTree: FolderTreeNode[];
   trashCount: number;
   visibleNotes: Note[];
   theme: "light" | "dark";
@@ -44,11 +42,10 @@ type AppSidebarProps = {
   onCreateFolder: () => void;
   onCreateNote: () => void;
   onFolderDraftChange: (value: string) => void;
-  onRestoreFolder: (folder: Folder) => void;
+  onRestoreFolder: (folder: FolderTreeNode) => void;
   onSearchChange: (value: string) => void;
   onClearSearch: () => void;
   onSelectCollection: (collection: Collection) => void;
-  onSelectFolder: (folder: FolderTreeNode) => void;
   onSelectNote: (noteId: number) => void;
   onSelectTag: (tag: string) => void;
   onTrashFolder: (folder: FolderTreeNode) => void;
@@ -57,7 +54,6 @@ type AppSidebarProps = {
 
 export function AppSidebar({
   activeCollection,
-  activeFolderId,
   activeNotesCount,
   activeTag,
   folderDraft,
@@ -68,7 +64,7 @@ export function AppSidebar({
   search,
   searchRef,
   tags,
-  trashedFolders,
+  trashedFolderTree,
   trashCount,
   visibleNotes,
   theme,
@@ -82,7 +78,6 @@ export function AppSidebar({
   onSearchChange,
   onClearSearch,
   onSelectCollection,
-  onSelectFolder,
   onSelectNote,
   onSelectTag,
   onTrashFolder,
@@ -111,7 +106,6 @@ export function AppSidebar({
       <SidebarContent className="notes-sidebar-content">
         <SidebarCollectionNav
           activeCollection={activeCollection}
-          activeFolderId={activeFolderId}
           activeNotesCount={activeNotesCount}
           activeTag={activeTag}
           tags={tags}
@@ -121,25 +115,20 @@ export function AppSidebar({
         />
         <SidebarFolderSection
           activeCollection={activeCollection}
-          activeFolderId={activeFolderId}
           folderDraft={folderDraft}
           folderTree={folderTree}
           isCreatingFolder={isCreatingFolder}
-          trashedFolders={trashedFolders}
+          isLoading={isLoading}
+          selectedNoteId={selectedNoteId}
+          trashedFolderTree={trashedFolderTree}
+          visibleNotes={visibleNotes}
           onBeginFolderCreation={onBeginFolderCreation}
           onCancelFolderCreation={onCancelFolderCreation}
           onCreateFolder={onCreateFolder}
           onFolderDraftChange={onFolderDraftChange}
           onRestoreFolder={onRestoreFolder}
-          onSelectFolder={onSelectFolder}
-          onTrashFolder={onTrashFolder}
-        />
-        <SidebarNoteList
-          activeCollection={activeCollection}
-          isLoading={isLoading}
-          selectedNoteId={selectedNoteId}
-          visibleNotes={visibleNotes}
           onSelectNote={onSelectNote}
+          onTrashFolder={onTrashFolder}
         />
       </SidebarContent>
 

@@ -1,4 +1,26 @@
-import type { FolderTreeNode } from "@/lib/notes-repository";
+import type { Folder, FolderTreeNode } from "@/lib/notes-repository";
+
+export function buildFolderTree(folders: Folder[]): FolderTreeNode[] {
+  const nodesById = new Map<number, FolderTreeNode>();
+  const roots: FolderTreeNode[] = [];
+
+  for (const folder of folders) {
+    nodesById.set(folder.id, { ...folder, children: [] });
+  }
+
+  for (const folder of folders) {
+    const node = nodesById.get(folder.id)!;
+    const parent = folder.parentId === null ? undefined : nodesById.get(folder.parentId);
+
+    if (parent) {
+      parent.children.push(node);
+    } else {
+      roots.push(node);
+    }
+  }
+
+  return roots;
+}
 
 export function findFolder(
   nodes: FolderTreeNode[],

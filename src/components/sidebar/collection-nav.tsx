@@ -19,7 +19,6 @@ const collections: { label: Collection; icon: typeof FileText }[] = [
 
 type SidebarCollectionNavProps = {
   activeCollection: Collection;
-  activeFolderId: number | null;
   activeNotesCount: number;
   activeTag: string | null;
   tags: string[];
@@ -30,7 +29,6 @@ type SidebarCollectionNavProps = {
 
 export function SidebarCollectionNav({
   activeCollection,
-  activeFolderId,
   activeNotesCount,
   activeTag,
   tags,
@@ -47,7 +45,7 @@ export function SidebarCollectionNav({
             {collections.map(({ label, icon: Icon }) => (
               <SidebarMenuItem key={label}>
                 <SidebarMenuButton
-                  isActive={activeCollection === label && activeFolderId === null && activeTag === null}
+                  isActive={activeCollection === label && activeTag === null}
                   tooltip={label}
                   onClick={() => onSelectCollection(label)}
                 >

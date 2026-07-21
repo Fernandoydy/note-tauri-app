@@ -6,7 +6,7 @@ import { EditorEmptyState } from "@/components/editor-empty-state";
 import { EditorToolbar } from "@/components/editor-toolbar";
 import { NoteEditor, type SaveStatus } from "@/components/note-editor";
 import { WorkspaceErrorAlert } from "@/components/workspace-error-alert";
-import { findFolder } from "@/lib/folder-tree";
+import { buildFolderTree, findFolder } from "@/lib/folder-tree";
 import { getErrorMessage } from "@/lib/error-message";
 import { normalizeTags } from "@/lib/note-tags";
 import * as notesRepository from "@/lib/notes-repository";
@@ -28,10 +28,10 @@ function App() {
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
   const [notes, setNotes] = useState<Note[]>([]);
   const [folderTree, setFolderTree] = useState<FolderTreeNode[]>([]);
-  const [trashedFolders, setTrashedFolders] = useState<Folder[]>([]);
+  const [trashedFolderTree, setTrashedFolderTree] = useState<FolderTreeNode[]>([]);
+  const [trashFolderCount, setTrashFolderCount] = useState(0);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [activeCollection, setActiveCollection] = useState<Collection>("Todas as notas");
-  const [activeFolderId, setActiveFolderId] = useState<number | null>(null);
   const [search, setSearch] = useState("");
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [folderDraft, setFolderDraft] = useState("");
@@ -47,25 +47,16 @@ function App() {
   const loadWorkspace = useCallback(async () => {
     setIsLoading(true);
     try {
-      const [loadedNotes, loadedFolderTree, allFolders] = await Promise.all([
+      const [loadedNotes, allFolders] = await Promise.all([
         notesRepository.listNotes(),
-        notesRepository.listFolderTree(),
         notesRepository.listFolders(true),
       ]);
-      const deletedFolderIds = new Set(
-        allFolders
-          .filter((folder) => folder.deletedAt !== null)
-          .map((folder) => folder.id),
-      );
+      const activeFolders = allFolders.filter((folder) => folder.deletedAt === null);
+      const trashedFolders = allFolders.filter((folder) => folder.deletedAt !== null);
       setNotes(loadedNotes);
-      setFolderTree(loadedFolderTree);
-      setTrashedFolders(
-        allFolders.filter(
-          (folder) =>
-            folder.deletedAt !== null &&
-            (folder.parentId === null || !deletedFolderIds.has(folder.parentId)),
-        ),
-      );
+      setFolderTree(buildFolderTree(activeFolders));
+      setTrashedFolderTree(buildFolderTree(trashedFolders));
+      setTrashFolderCount(trashedFolders.length);
       setErrorMessage(null);
     } catch (error) {
       setErrorMessage(getErrorMessage(error));
@@ -88,10 +79,7 @@ function App() {
     return () => timers.forEach((timer) => clearTimeout(timer));
   }, []);
 
-  const activeFolder = useMemo(
-    () => findFolder(folderTree, activeFolderId),
-    [activeFolderId, folderTree],
-  );
+
 
   const visibleNotes = useMemo(() => {
     const normalizedQuery = search.trim().toLocaleLowerCase("pt-BR");
@@ -102,7 +90,6 @@ function App() {
         (activeCollection === "Favoritas" && !note.deletedAt && !note.isArchived && note.isPinned) ||
         (activeCollection === "Arquivadas" && !note.deletedAt && note.isArchived) ||
         (activeCollection === "Lixeira" && Boolean(note.deletedAt));
-      const matchesFolder = activeFolderId === null || note.folderId === activeFolderId;
       const matchesTag = !activeTag || note.tags.includes(activeTag);
       const matchesSearch =
         !normalizedQuery ||
@@ -111,9 +98,9 @@ function App() {
           .toLocaleLowerCase("pt-BR")
           .includes(normalizedQuery);
 
-      return matchesCollection && matchesFolder && matchesTag && matchesSearch;
+      return matchesCollection && matchesTag && matchesSearch;
     });
-  }, [activeCollection, activeFolderId, activeTag, notes, search]);
+  }, [activeCollection, activeTag, notes, search]);
 
   useEffect(() => {
     if (visibleNotes.some((note) => note.id === selectedId)) return;
@@ -123,7 +110,7 @@ function App() {
   const createNote = useCallback(async () => {
     setSaveStatus("saving");
     try {
-      const newNote = await notesRepository.createNote(activeFolderId);
+      const newNote = await notesRepository.createNote();
       setNotes((current) => [newNote, ...current]);
       setSelectedId(newNote.id);
       setActiveCollection("Todas as notas");
@@ -135,7 +122,7 @@ function App() {
       setSaveStatus("error");
       setErrorMessage(getErrorMessage(error));
     }
-  }, [activeFolderId]);
+  }, []);
 
   useEffect(() => {
     const handleShortcut = (event: KeyboardEvent) => {
@@ -162,10 +149,10 @@ function App() {
     [notes],
   );
   const activeNotesCount = notes.filter((note) => !note.deletedAt && !note.isArchived).length;
-  const trashCount = notes.filter((note) => note.deletedAt).length + trashedFolders.length;
+  const trashCount = notes.filter((note) => note.deletedAt).length + trashFolderCount;
   const selectedNoteFolder = useMemo(
-    () => findFolder(folderTree, selectedNote?.folderId ?? null),
-    [folderTree, selectedNote?.folderId],
+    () => findFolder([...folderTree, ...trashedFolderTree], selectedNote?.folderId ?? null),
+    [folderTree, selectedNote?.folderId, trashedFolderTree],
   );
 
   function scheduleSave(note: Note) {
@@ -227,7 +214,7 @@ function App() {
 
   async function createFolder() {
     try {
-      await notesRepository.createFolder(folderDraft, activeFolderId);
+      await notesRepository.createFolder(folderDraft);
       setFolderDraft("");
       setIsCreatingFolder(false);
       await loadWorkspace();
@@ -241,7 +228,6 @@ function App() {
 
     try {
       await notesRepository.moveFolderToTrash(folderPendingTrash.id);
-      setActiveFolderId(null);
       setSelectedId(null);
       setFolderPendingTrash(null);
       await loadWorkspace();
@@ -254,7 +240,6 @@ function App() {
     try {
       await notesRepository.restoreFolder(folder.id);
       setActiveCollection("Todas as notas");
-      setActiveFolderId(folder.id);
       await loadWorkspace();
     } catch (error) {
       setErrorMessage(getErrorMessage(error));
@@ -289,7 +274,6 @@ function App() {
         note.id === selectedNote.id ? { ...note, deletedAt: null, updatedAt } : note
       )));
       setActiveCollection(selectedNote.isArchived ? "Arquivadas" : "Todas as notas");
-      setActiveFolderId(selectedNote.folderId);
       setSelectedId(selectedNote.id);
       setSaveStatus("saved");
       setErrorMessage(null);
@@ -315,13 +299,12 @@ function App() {
     }
   }
 
-  const heading = activeTag ? `#${activeTag}` : activeFolder?.name ?? activeCollection;
+  const heading = activeTag ? `#${activeTag}` : activeCollection;
 
   return (
     <AppSidebarProvider>
       <AppSidebar
         activeCollection={activeCollection}
-        activeFolderId={activeFolderId}
         activeNotesCount={activeNotesCount}
         activeTag={activeTag}
         folderDraft={folderDraft}
@@ -332,7 +315,7 @@ function App() {
         search={search}
         searchRef={searchRef}
         tags={tags}
-        trashedFolders={trashedFolders}
+        trashedFolderTree={trashedFolderTree}
         trashCount={trashCount}
         visibleNotes={visibleNotes}
         theme={theme}
@@ -343,7 +326,6 @@ function App() {
         }}
         onBrandClick={() => {
           setActiveCollection("Todas as notas");
-          setActiveFolderId(null);
           setActiveTag(null);
         }}
         onCancelFolderCreation={() => {
@@ -358,19 +340,11 @@ function App() {
         onClearSearch={() => setSearch("")}
         onSelectCollection={(collection) => {
           setActiveCollection(collection);
-          setActiveFolderId(null);
           setActiveTag(null);
-        }}
-        onSelectFolder={(folder) => {
-          setActiveCollection("Todas as notas");
-          setActiveTag(null);
-          setActiveFolderId(folder.id);
-          setSearch("");
         }}
         onSelectNote={setSelectedId}
         onSelectTag={(tag) => {
           setActiveCollection("Todas as notas");
-          setActiveFolderId(null);
           setActiveTag(activeTag === tag ? null : tag);
         }}
         onTrashFolder={setFolderPendingTrash}
