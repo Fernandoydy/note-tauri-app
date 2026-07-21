@@ -30,6 +30,8 @@ type SidebarFolderSectionProps = {
   onCancelFolderCreation: () => void;
   onCreateFolder: () => void;
   onFolderDraftChange: (value: string) => void;
+  onMoveFolder: (folderId: number, parentId: number | null) => void;
+  onMoveNote: (noteId: number, folderId: number | null) => void;
   onRestoreFolder: (folder: FolderTreeNode) => void;
   onSelectNote: (noteId: number) => void;
   onTrashFolder: (folder: FolderTreeNode) => void;
@@ -48,6 +50,8 @@ export function SidebarFolderSection({
   onCancelFolderCreation,
   onCreateFolder,
   onFolderDraftChange,
+  onMoveFolder,
+  onMoveNote,
   onRestoreFolder,
   onSelectNote,
   onTrashFolder,
@@ -91,6 +95,8 @@ export function SidebarFolderSection({
             notes={visibleNotes}
             selectedNoteId={selectedNoteId}
             mode={isTrash ? "trash" : "active"}
+            onMoveFolder={onMoveFolder}
+            onMoveNote={onMoveNote}
             onRestoreFolder={onRestoreFolder}
             onSelectNote={onSelectNote}
             onTrashFolder={onTrashFolder}

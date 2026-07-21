@@ -42,6 +42,8 @@ type AppSidebarProps = {
   onCreateFolder: () => void;
   onCreateNote: () => void;
   onFolderDraftChange: (value: string) => void;
+  onMoveFolder: (folderId: number, parentId: number | null) => void;
+  onMoveNote: (noteId: number, folderId: number | null) => void;
   onRestoreFolder: (folder: FolderTreeNode) => void;
   onSearchChange: (value: string) => void;
   onClearSearch: () => void;
@@ -74,6 +76,8 @@ export function AppSidebar({
   onCreateFolder,
   onCreateNote,
   onFolderDraftChange,
+  onMoveFolder,
+  onMoveNote,
   onRestoreFolder,
   onSearchChange,
   onClearSearch,
@@ -126,6 +130,8 @@ export function AppSidebar({
           onCancelFolderCreation={onCancelFolderCreation}
           onCreateFolder={onCreateFolder}
           onFolderDraftChange={onFolderDraftChange}
+          onMoveFolder={onMoveFolder}
+          onMoveNote={onMoveNote}
           onRestoreFolder={onRestoreFolder}
           onSelectNote={onSelectNote}
           onTrashFolder={onTrashFolder}

@@ -223,6 +223,24 @@ function App() {
     }
   }
 
+  async function moveFolder(folderId: number, parentId: number | null) {
+    try {
+      await notesRepository.moveFolder(folderId, parentId);
+      await loadWorkspace();
+    } catch (error) {
+      setErrorMessage(getErrorMessage(error));
+    }
+  }
+
+  async function moveNoteToFolder(noteId: number, folderId: number | null) {
+    try {
+      await notesRepository.moveNotesToFolder([noteId], folderId);
+      await loadWorkspace();
+    } catch (error) {
+      setErrorMessage(getErrorMessage(error));
+    }
+  }
+
   async function confirmTrashFolder() {
     if (!folderPendingTrash) return;
 
@@ -335,6 +353,8 @@ function App() {
         onCreateFolder={() => void createFolder()}
         onCreateNote={() => void createNote()}
         onFolderDraftChange={setFolderDraft}
+        onMoveFolder={(folderId, parentId) => void moveFolder(folderId, parentId)}
+        onMoveNote={(noteId, folderId) => void moveNoteToFolder(noteId, folderId)}
         onRestoreFolder={(folder) => void restoreFolder(folder)}
         onSearchChange={setSearch}
         onClearSearch={() => setSearch("")}
