@@ -221,6 +221,9 @@ button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
 .editor-header { display: flex; align-items: center; justify-content: space-between; height: 88px; }
 .editor-status { display: flex; align-items: center; gap: 7px; color: #84908b; font-size: 11px; }
 .save-dot { width: 6px; height: 6px; border-radius: 50%; background: #7b9b83; box-shadow: 0 0 0 3px rgba(123, 155, 131, .13); }
+.editor-status--saving .save-dot { background: #d39a42; box-shadow: 0 0 0 3px rgba(211, 154, 66, .13); }
+.editor-status--error { color: #b54d39; }
+.editor-status--error .save-dot { background: #b54d39; box-shadow: 0 0 0 3px rgba(181, 77, 57, .13); }
 .editor-actions { display: flex; gap: 3px; }
 .editor-actions button { color: #77817d; }
 .editor-actions button:hover { color: #3f4b47; background: rgba(255,255,255,.57); }
@@ -274,8 +277,17 @@ button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
 .note-body-input::placeholder { color: #b4b5ad; }
 .paper [data-slot="separator"] { background: #e8e7df; }
 .paper-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 17px; color: #9a9d94; font-size: 10px; }
-.editor-tags { display: flex; gap: 5px; }
-.editor-tags [data-slot="badge"] { height: 19px; color: #77827b; background: #f0f0ea; font-size: 9px; font-weight: 500; }
+.editor-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+.editor-tags [data-slot="badge"] { height: 22px; color: #77827b; background: #f0f0ea; font-size: 9px; font-weight: 500; }
+.tag-remove-button { width: 15px; height: 15px; min-width: 15px; margin-right: -4px; padding: 0; border-radius: 50%; color: #89928d; }
+.tag-remove-button:hover { color: #b54d39; background: #e7e5dd; }
+.tag-remove-button svg { width: 10px; height: 10px; }
+.tag-input { width: 96px; height: 22px; padding: 0 4px; border: 0; border-bottom: 1px dashed #c9ccc4; border-radius: 0; background: transparent; box-shadow: none; color: #65716b; font-size: 10px; }
+.tag-input:focus-visible { border-bottom-color: #d5a58c; box-shadow: none; }
+.database-error { margin: -9px 22px 12px; padding: 8px 10px; border-radius: 7px; color: #a64231; background: #f8e4df; font-size: 11px; line-height: 1.35; }
+.tag-link--active { color: #293735; background: rgba(255,255,255,.7); font-weight: 650; }
+.editor-panel--empty { display: grid; place-items: center; }
+.empty-editor { width: min(100%, 430px); border-color: #d7d9d3; background: rgba(255, 254, 250, .72); }
 
 @media (max-width: 980px) {
   .app-shell { grid-template-columns: 64px minmax(280px, 360px) minmax(420px, 1fr); }
